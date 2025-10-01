@@ -35,6 +35,8 @@ The standard goal we want you to accomplish is an app consisting of two parts.
 
 First part is a form where the user types contact's email address. After submitting the form, something like a business card containing the contact's info should appear. The profile picture should be shown as well.
 
+Email Examples: mroyster@royster.com, ealbares@gmail.com, oliver@hotmail.com, michael.ostrosky@ostrosky.com, kati.rulapaugh@hotmail.com
+
 You should also handle the states, where wrong user input is given or no contact is found.
 
 Second part of the app is a list of previously visited contacts. This list must preserve browser window/tab close and reopen. The user should be able to click the contacts they previously visited and open their business card again. Keep in mind, that contact info including the email address might change over time. If so, you should update the data in the preserverd list. Items in the list must not sync among other users or devices.

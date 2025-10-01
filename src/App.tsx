@@ -1,73 +1,107 @@
-import React from 'react';
-import connection from './eWayAPI/Connector';
-import { TContactsResopnse } from './eWayAPI/ContactsResponse';
-import { mergeStyleSets, Dialog, DialogType, DialogFooter, PrimaryButton, ProgressIndicator } from '@fluentui/react';
+import React from "react";
+import connection from "./eWayAPI/Connector";
+import { TContact, TContactsResponse } from "./eWayAPI/ContactsResponse";
+///
+import ContactForm from "./components/ContactForm";
+import BusinessCard from "./components/BusinessCard";
+import { usePersistentHistory } from "./storage/LocalStorage";
+import ContactList from "./components/ContactList";
+import "./index.css";
+///
 
-const css = mergeStyleSets({
-    loadingDiv: {
-        width: '50vw',
-        position: 'absolute',
-        left: '25vw',
-        top: '40vh'
-    }
-});
+// Email Examples: mroyster@royster.com, ealbares@gmail.com, oliver@hotmail.com, michael.ostrosky@ostrosky.com, kati.rulapaugh@hotmail.com
 
-const dialogContentProps = {
-    type: DialogType.normal,
-    title: 'Agent Data',
-    isDraggable: false
-};
-
-const modalProps = {
-    isBlocking: true
-};
-
-// This is a React Hook component.
 const App = () => {
-    const [fullName, setFullName] = React.useState<string | null>(null);
+  const [contact, setContact] = React.useState<TContact | null>(null);
+  const { history, upsert } = usePersistentHistory();
 
-    React.useEffect(() => {
-        setTimeout(() => {
-            connection.callMethod(
-                'SearchContacts',
-                {
-                    transmitObject: {
-                        Email1Address: 'mroyster@royster.com' // ealbares@gmail.com, oliver@hotmail.com, michael.ostrosky@ostrosky.com, kati.rulapaugh@hotmail.com and many others
-                    },
-                    includeProfilePictures: false
-                },
-                (result: TContactsResopnse) => {
-                    if (result.Data.length !== 0 && !!result.Data[0].FileAs) {
-                        setFullName(result.Data[0].FileAs);
-                    } else {
-                        setFullName('...top secret...');
-                    }
-                }
-            );
-        },
-            5000
-        );
-    });
+  const handleContactFormSubmit = async (
+    email: string
+  ): Promise<TContactsResponse> => {
+    // console.log("Looking up contact for email:", email);
+    return new Promise<TContactsResponse>((resolve) => {
+      try {
+        connection.callMethod<TContactsResponse>(
+          "SearchContacts",
+          {
+            transmitObject: {
+              Email1Address: email,
+            },
+            includeProfilePictures: true,
+          },
+          (result: TContactsResponse) => {
+            // console.log("TYPE  ", typeof result);
+            // console.log(result);
+            if (result.Data.length !== 0 && !!result.Data[0].FileAs) {
+              const apiContact = result.Data[0];
+              console.log("API CONTACT  ", apiContact);
 
-    return (
-        <div>
-            <Dialog
-                hidden={!fullName}
-                onDismiss={() => setFullName(null)}
-                dialogContentProps={{ ...dialogContentProps, subText: `His/her name is ${fullName}.` }}
-                modalProps={modalProps}
-            >
-                <DialogFooter>
-                    <PrimaryButton onClick={() => window.location.href = 'https://www.eway-crm.com'} text="OK" />
-                </DialogFooter>
-            </Dialog>
-            {(!fullName) &&
-                <div className={css.loadingDiv}>
-                    <ProgressIndicator label="Loading Agent Name" description="This tape will be destroyed after watching." />
-                </div>
+              const mappedContact: TContact = {
+                ItemGUID: apiContact.ItemGUID,
+                Email: email,
+                FileAs: apiContact.FileAs,
+                ProfilePicture: apiContact.ProfilePicture,
+                TelephoneNumber1: apiContact.TelephoneNumber1,
+                Company: apiContact.Company,
+                Title: apiContact.Title,
+                BusinessAddressCity: apiContact.BusinessAddressCity,
+                BusinessAddressPObox: apiContact.BusinessAddressPObox,
+                BusinessAddressPostalCode: apiContact.BusinessAddressPostalCode,
+                BusinessAddressState: apiContact.BusinessAddressState,
+                BusinessAddressStreet: apiContact.BusinessAddressStreet,
+                LastFetchedAt: new Date().toISOString(),
+              };
+              setContact(mappedContact);
+              upsert(mappedContact);
+            } else {
+              setContact(null);
             }
-        </div>
-    );
+            resolve(result);
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching contact:", error);
+        setContact(null);
+        resolve({
+          Data: [],
+          Description: "",
+          ReturnCode: "",
+        } as TContactsResponse);
+      }
+    });
+  };
+  // console.log("Contact:", contact);
+  return (
+    <div className="min-h-screen bg-gray-300">
+      <main className="max-w-xl mx-auto px-6 py-10 space-y-8">
+        <section className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Find a Contact
+          </h2>
+          <ContactForm onSubmit={handleContactFormSubmit} />
+        </section>
+
+        {contact && (
+          <section className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+            <BusinessCard contact={contact} />
+          </section>
+        )}
+
+        <section className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            Lookup History
+          </h3>
+          <ContactList
+            history={history}
+            onSelect={(c) => {
+              // refetch for the latest
+              void handleContactFormSubmit(c.Email);
+            }}
+          />
+        </section>
+      </main>
+    </div>
+  );
 };
 
 export default App;

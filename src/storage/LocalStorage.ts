@@ -25,11 +25,13 @@ export function usePersistentHistory() {
     saveHistory(contactHistory);
   }, [contactHistory]);
 
+  // updates on guid -> email may change
   const upsert = useCallback((contact: TContact) => {
     setHistory((prev) => {
-      const key = contact.ItemGUID ?? contact.Email.toLowerCase();
+      const key =
+        contact.ItemGUID ?? contact.Email1Address?.toLowerCase() ?? "";
       const idx = prev.findIndex(
-        (p) => (p.ItemGUID ?? p.Email.toLowerCase()) === key
+        (p) => (p.ItemGUID ?? p.Email1Address?.toLowerCase() ?? "") === key
       );
       const item = {
         ...prev[idx],

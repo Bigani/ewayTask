@@ -13,7 +13,7 @@ function BusinessCard({ contact }: { contact: TContact | null }) {
                 ? contact.ProfilePicture
                 : `data:image/png;base64,${contact.ProfilePicture}`
             }
-            alt={contact.FileAs ?? contact.Email}
+            alt={contact.FileAs ?? contact.Email1Address ?? "Profile Picture"}
             className="w-20 h-20 rounded-full object-cover  "
           />
         ) : (
@@ -41,7 +41,7 @@ function BusinessCard({ contact }: { contact: TContact | null }) {
         )}
         {
           <p className="text-gray-700">
-            <strong>Email:</strong> {contact.Email}
+            <strong>Email:</strong> {contact.Email1Address}
           </p>
         }
         {contact.TelephoneNumber1 && (

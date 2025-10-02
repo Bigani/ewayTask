@@ -14,7 +14,7 @@ afterEach(() => {
 
 const mockContacts: TContact = {
   ItemGUID: "1",
-  Email: "test@test.com",
+  Email1Address: "test@test.com",
   FileAs: "Test User",
   ProfilePicture: null,
   TelephoneNumber1: "123456789",

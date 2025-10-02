@@ -14,7 +14,7 @@ afterEach(() => {
 const mockContacts: TContact[] = [
   {
     ItemGUID: "1",
-    Email: "test1@example.com",
+    Email1Address: "test1@example.com",
     FileAs: "Test User 1",
     ProfilePicture: null,
     TelephoneNumber1: null,
@@ -29,7 +29,7 @@ const mockContacts: TContact[] = [
   },
   {
     ItemGUID: "2",
-    Email: "test2@example.com",
+    Email1Address: "test2@example.com",
     FileAs: "Test User 2",
     ProfilePicture: null,
     TelephoneNumber1: "987654321",

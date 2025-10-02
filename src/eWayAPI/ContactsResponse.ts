@@ -10,7 +10,7 @@ export type TContact = ContactInfo & {
 
 export type ContactInfo = {
   ItemGUID: string;
-  Email: string;
+  Email1Address: string | null;
   ProfilePicture: string | null;
   TelephoneNumber1: string | null;
   Company: string | null;

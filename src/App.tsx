@@ -30,11 +30,10 @@ const App = () => {
             includeProfilePictures: true,
           },
           (result: TContactsResponse) => {
-            console.log("TYPE  ", typeof result);
-            console.log(result);
+            // console.log(result);
             if (result.Data.length !== 0 && !!result.Data[0].FileAs) {
               const apiContact = result.Data[0];
-              console.log("API CONTACT  ", apiContact);
+              // console.log("API CONTACT  ", apiContact);
               const mappedContact = mapApiContact(apiContact);
               setContact(mappedContact);
               upsert(mappedContact);
@@ -59,7 +58,7 @@ const App = () => {
   function mapApiContact(contact: TContact): TContact {
     return {
       ItemGUID: contact.ItemGUID,
-      Email: contact.Email,
+      Email1Address: contact.Email1Address,
       FileAs: contact.FileAs,
       ProfilePicture: contact.ProfilePicture,
       TelephoneNumber1: contact.TelephoneNumber1,
@@ -97,9 +96,10 @@ const App = () => {
           </h3>
           <ContactList
             contactHistory={contactHistory}
-            onSelect={(c) => {
+            onSelect={(contact: TContact) => {
               // refetch for the latest
-              void handleContactFormSubmit(c.Email);
+              if (typeof contact.Email1Address === "string")
+                void handleContactFormSubmit(contact.Email1Address);
             }}
           />
         </section>

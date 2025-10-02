@@ -14,7 +14,7 @@ function ContactList({ contactHistory, onSelect }: Props) {
         {contactHistory.map((contact) => (
           <li
             key={contact.ItemGUID}
-            className="flex items-center rounded-lg  p-4 hover:bg-gray-300 shadow-md shadow-red-300/50 cursor-pointer transition bg-gray-200 hover:bg-gray-300"
+            className="flex items-center rounded-lg  p-4  shadow-md shadow-red-300/50 cursor-pointer transition bg-gray-200 hover:bg-gray-300"
             onClick={onSelect ? () => onSelect(contact) : undefined}
           >
             <div className="flex items-center gap-2">
@@ -27,7 +27,7 @@ function ContactList({ contactHistory, onSelect }: Props) {
                   className="w-10 h-10 rounded-full border border-gray-200 object-cover"
                 />
               )}
-              <span>{contact.FileAs || contact.Email}</span>
+              <span>{contact.FileAs || contact.Email1Address}</span>
             </div>
           </li>
         ))}

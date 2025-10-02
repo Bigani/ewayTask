@@ -13,7 +13,7 @@ import "./index.css";
 
 const App = () => {
   const [contact, setContact] = React.useState<TContact | null>(null);
-  const { history, upsert } = usePersistentHistory();
+  const { contactHistory, upsert } = usePersistentHistory();
 
   const handleContactFormSubmit = async (
     email: string
@@ -30,27 +30,12 @@ const App = () => {
             includeProfilePictures: true,
           },
           (result: TContactsResponse) => {
-            // console.log("TYPE  ", typeof result);
-            // console.log(result);
+            console.log("TYPE  ", typeof result);
+            console.log(result);
             if (result.Data.length !== 0 && !!result.Data[0].FileAs) {
               const apiContact = result.Data[0];
               console.log("API CONTACT  ", apiContact);
-
-              const mappedContact: TContact = {
-                ItemGUID: apiContact.ItemGUID,
-                Email: email,
-                FileAs: apiContact.FileAs,
-                ProfilePicture: apiContact.ProfilePicture,
-                TelephoneNumber1: apiContact.TelephoneNumber1,
-                Company: apiContact.Company,
-                Title: apiContact.Title,
-                BusinessAddressCity: apiContact.BusinessAddressCity,
-                BusinessAddressPObox: apiContact.BusinessAddressPObox,
-                BusinessAddressPostalCode: apiContact.BusinessAddressPostalCode,
-                BusinessAddressState: apiContact.BusinessAddressState,
-                BusinessAddressStreet: apiContact.BusinessAddressStreet,
-                LastFetchedAt: new Date().toISOString(),
-              };
+              const mappedContact = mapApiContact(apiContact);
               setContact(mappedContact);
               upsert(mappedContact);
             } else {
@@ -70,6 +55,25 @@ const App = () => {
       }
     });
   };
+
+  function mapApiContact(contact: TContact): TContact {
+    return {
+      ItemGUID: contact.ItemGUID,
+      Email: contact.Email,
+      FileAs: contact.FileAs,
+      ProfilePicture: contact.ProfilePicture,
+      TelephoneNumber1: contact.TelephoneNumber1,
+      Company: contact.Company,
+      Title: contact.Title,
+      BusinessAddressCity: contact.BusinessAddressCity,
+      BusinessAddressPObox: contact.BusinessAddressPObox,
+      BusinessAddressPostalCode: contact.BusinessAddressPostalCode,
+      BusinessAddressState: contact.BusinessAddressState,
+      BusinessAddressStreet: contact.BusinessAddressStreet,
+      LastFetchedAt: new Date().toISOString(),
+    };
+  }
+
   // console.log("Contact:", contact);
   return (
     <div className="min-h-screen bg-gray-300">
@@ -92,7 +96,7 @@ const App = () => {
             Lookup History
           </h3>
           <ContactList
-            history={history}
+            contactHistory={contactHistory}
             onSelect={(c) => {
               // refetch for the latest
               void handleContactFormSubmit(c.Email);

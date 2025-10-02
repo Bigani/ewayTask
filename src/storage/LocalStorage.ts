@@ -17,11 +17,13 @@ export function saveHistory(list: TContact[]) {
 }
 
 export function usePersistentHistory() {
-  const [history, setHistory] = useState<TContact[]>(() => loadHistory());
+  const [contactHistory, setHistory] = useState<TContact[]>(() =>
+    loadHistory()
+  );
 
   useEffect(() => {
-    saveHistory(history);
-  }, [history]);
+    saveHistory(contactHistory);
+  }, [contactHistory]);
 
   const upsert = useCallback((contact: TContact) => {
     setHistory((prev) => {
@@ -43,5 +45,5 @@ export function usePersistentHistory() {
     });
   }, []);
 
-  return { history, upsert };
+  return { contactHistory, upsert };
 }
